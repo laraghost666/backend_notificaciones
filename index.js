@@ -2,11 +2,29 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/uploads', express.static('uploads')); // para servir imágenes
 
+const upload = multer({ storage });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = 'uploads/';
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const nombreArchivo = Date.now() + ext;
+    cb(null, nombreArchivo);
+  }
+});
 // Conexión a MySQL (SparkedHost)
 const db = mysql.createConnection({
   host: 'db-buf-03.sparkedhost.us',
@@ -33,21 +51,19 @@ app.get('/usuarios', (req, res) => {
     res.json(results);
   });
 });
+app.post('/crear', upload.single('photo'), (req, res) => {
+  const { nombre, titulo, descripcion, date } = req.body;
+  const photo = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
 
-// app.post('/usuarios', (req, res) => {
-//   const { nombre, edad } = req.body;
-//   db.query('INSERT INTO usuarios (nombre, edad) VALUES (?, ?)', [nombre, edad], (err, result) => {
-//     if (err) throw err;
-//     res.json({ message: 'Usuario agregado', id: result.insertId });
-//   });
-// });
-
-// app.delete('/usuarios/:id', (req, res) => {
-//   const { id } = req.params;
-//   db.query('DELETE FROM usuarios WHERE id = ?', [id], (err) => {
-//     if (err) throw err;
-//     res.json({ message: 'Usuario eliminado' });
-//   });
-// });
+  const sql = 'INSERT INTO services (nombre, titulo, descripcion, photo, date) VALUES (?, ?, ?, ?, ?)';
+  db.query(sql, [nombre, titulo, descripcion, photo, date], (err, result) => {
+    if (err) {
+      console.error('Error al insertar:', err);
+      res.status(500).send('Error al guardar');
+    } else {
+      res.send('Registro guardado');
+    }
+  });
+});
 
 app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
