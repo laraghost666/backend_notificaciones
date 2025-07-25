@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads')); // para servir imágenes
 
-const upload = multer({ storage });
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -25,6 +25,7 @@ const storage = multer.diskStorage({
     cb(null, nombreArchivo);
   }
 });
+const upload = multer({ storage });
 // Conexión a MySQL (SparkedHost)
 const db = mysql.createConnection({
   host: 'db-buf-03.sparkedhost.us',
