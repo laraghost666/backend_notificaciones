@@ -67,5 +67,14 @@ app.post('/crear', upload.single('photo'), (req, res) => {
     }
   });
 });
+app.get('/ver/:id', (req, res) => {
+  const { id } = req.params;
+  db.query('SELECT * FROM services WHERE id = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al buscar' });
+    if (results.length === 0) return res.status(404).json({ error: 'No encontrado' });
+    res.json(results[0]);
+  });
+});
+
 
 app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
