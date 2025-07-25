@@ -53,7 +53,8 @@ app.get('/usuarios', (req, res) => {
   });
 });
 app.post('/crear', upload.single('photo'), (req, res) => {
-  const { nombre, titulo, descripcion, date } = req.body;
+  let { nombre, titulo, descripcion, date } = req.body;
+  date = date.split('T')[0];
   const photo = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
 
   const sql = 'INSERT INTO services (nombre, titulo, descripcion, photo, date) VALUES (?, ?, ?, ?, ?)';
