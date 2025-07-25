@@ -27,12 +27,12 @@ app.get('/', (req, res) => {
 });
 
 // CRUD básico para "usuarios"
-// app.get('/usuarios', (req, res) => {
-//   db.query('SELECT * FROM usuarios', (err, results) => {
-//     if (err) throw err;
-//     res.json(results);
-//   });
-// });
+app.get('/usuarios', (req, res) => {
+  db.query('SELECT * FROM services', (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
 
 // app.post('/usuarios', (req, res) => {
 //   const { nombre, edad } = req.body;
