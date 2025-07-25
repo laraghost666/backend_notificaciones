@@ -75,6 +75,20 @@ app.get('/ver/:id', (req, res) => {
     res.json(results[0]);
   });
 });
+app.post('/login', (req, res) => {
+  const { usuario, password } = req.body;
+  const sql = 'SELECT * FROM usuarios WHERE usuario = ? AND password = ?';
+
+  db.query(sql, [usuario, password], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error en servidor' });
+    if (results.length > 0) {
+      res.json({ success: true, user: results[0] });
+    } else {
+      res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+    }
+  });
+});
+
 
 
 app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
